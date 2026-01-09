@@ -58,8 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     log(`CSV読み込み完了: ${total}件のデータを検出`);
 
                     // 3. 画像処理ループ (並行処理数を制限しつつ実行)
-                    // ブラウザの負荷を考慮して、一度に処理する数を制限する (例: 5並列)
-                    const concurrency = 5;
+                    // ブラウザの負荷を考慮して、一度に処理する数を制限する (例: 10並列)
+                    const concurrency = 10;
                     const queue = [...rows];
                     const activeWorkers = [];
 
