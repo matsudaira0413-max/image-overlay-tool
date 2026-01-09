@@ -1,0 +1,12 @@
+{
+  "name": "image-overlay-tool",
+  "version": "1.0.0",
+  "description": "Image overlay tool running on browser",
+  "scripts": {
+    "start": "echo 'No build step required for static site'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

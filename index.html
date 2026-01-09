@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像オーバーレイツール (Browser Version)</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .action-button {
+            padding: 12px 24px;
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .action-button:hover {
+            background-color: #0051a2;
+        }
+        .action-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.2s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        .log-area {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #333;
+            color: #eee;
+            height: 150px;
+            overflow-y: auto;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .template-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #0070f3;
+            text-decoration: none;
+        }
+        .template-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <h1>画像オーバーレイツール</h1>
+    <p>ブラウザ上で画像を処理します。データはサーバーに保存されません。</p>
+
+    <div class="container">
+        <a href="#" id="download-template" class="template-link">CSVテンプレートをダウンロード</a>
+
+        <div class="form-group">
+            <label for="overlay-image">1. 重ね合わせる透過PNG画像</label>
+            <input type="file" id="overlay-image" accept=".png">
+        </div>
+
+        <div class="form-group">
+            <label for="csv-file">2. 画像URLリスト (CSV)</label>
+            <input type="file" id="csv-file" accept=".csv">
+        </div>
+
+        <button id="start-button" class="action-button">処理開始</button>
+
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">0% (0/0)</div>
+        </div>
+
+        <div class="log-area" id="log-area">
+            <div>準備完了</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
