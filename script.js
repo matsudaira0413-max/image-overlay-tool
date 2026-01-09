@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // テンプレートダウンロード
     downloadTemplateBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        const csvContent = "val1,val2\noutput_filename,image_url\nsample1.jpg,https://example.com/image1.jpg\nsample2.jpg,https://example.com/image2.jpg";
+        const csvContent = "https://example.com/image1.jpg\nhttps://example.com/image2.jpg";
         const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM付き
         saveAs(blob, "template.csv");
     });
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 2. CSVのパース
             Papa.parse(csvInput.files[0], {
-                header: true,
+                header: false, // ヘッダーなしで読み込む
                 skipEmptyLines: true,
                 complete: async (results) => {
                     const rows = results.data;
@@ -64,13 +64,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     const activeWorkers = [];
 
                     const processImage = async (row) => {
-                        const url = row['image_url'];
-                        let filename = row['output_filename'];
+                        // 1列目をURLとして扱う
+                        let url = row[0];
 
-                        if (!url || !filename) return; // データ不備はスキップ
+                        // ヘッダー行っぽい場合はスキップ
+                        if (url && (url.toLowerCase() === 'image_url' || url.toLowerCase() === 'url')) return;
+
+                        if (!url) return; // 空データのスキップ
+
+                        // 拡張子チェック・ファイル名抽出
+                        let cleanUrl = url.split(/[?#]/)[0]; // クエリパラメータ除去
+                        let filename = cleanUrl.substring(cleanUrl.lastIndexOf('/') + 1);
+                        
+                        try {
+                            filename = decodeURIComponent(filename);
+                        } catch (e) {
+                            // デコード失敗時はそのまま
+                        }
+
+                        if (!filename || filename.length === 0) {
+                            filename = `image_${Date.now()}.jpg`;
+                        }
+
                         if (!filename.toLowerCase().endsWith('.jpg') && !filename.toLowerCase().endsWith('.jpeg')) {
+                            // 元のファイル名に拡張子がない、またはjpgでない場合は .jpg を付与
+                            // (ただし、pngなどを透過合成してjpg保存する仕様なので、拡張子は.jpgにするのが自然)
                             filename += '.jpg';
                         }
+                        
+                        // 元が .png などの場合でも、出力は Canvas.toBlob(..., 'image/jpeg') なので拡張子を .jpg に置換する方が丁寧ではあるが
+                        // ここでは単純に元ファイル名を尊重しつつ、拡張子がなければつける運用にする。
 
                         try {
                             // プロキシ経由で画像を取得
